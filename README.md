@@ -38,7 +38,7 @@ The system accurately classifies MRI scans into four distinct clinical categorie
 
 ---
 
-## 🚀 Quickstart & Web Application Setup
+## 🚀 Quickstart & Local Setup
 
 ### Option 1: Direct Browser Launch (Standalone Frontend)
 No complex backend installation required! Open `index.html` directly in any web browser or serve with a lightweight HTTP server:
@@ -63,6 +63,29 @@ pip install -r requirements.txt
 python app.py
 ```
 The application will launch on `http://localhost:5000` with live REST API capabilities!
+
+---
+
+## 🌐 Where & How to Deploy
+
+### 1. **Vercel / GitHub Pages (Free Frontend Hosting)**
+- **GitHub Pages**: Go to Repo **Settings** $\rightarrow$ **Pages** $\rightarrow$ Select `main` branch $\rightarrow$ Save. Your site will be live at `https://<your-username>.github.io/Brain-Tumor/`.
+- **Vercel**: Import repository on [Vercel.com](https://vercel.com) and click **Deploy**.
+
+### 2. **Render / Railway (Full Python API Server + Frontend)**
+- **Render**: Connect repository on [Render.com](https://render.com), set Build Command to `pip install -r requirements.txt`, and Start Command to `gunicorn app:app`.
+
+### 3. **Hugging Face Spaces (Machine Learning Hosting)**
+- Create a new Space on [Hugging Face Spaces](https://huggingface.co/spaces) with **Docker** or **Flask** SDK and sync with your GitHub repo.
+
+### 4. **Docker Container Deployment**
+```bash
+# Build Docker image
+docker build -t brain-tumor-ai .
+
+# Run container
+docker run -p 5000:5000 brain-tumor-ai
+```
 
 ---
 
