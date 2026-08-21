@@ -1,172 +1,122 @@
-# Brain Tumor Classification Using Deep Learning & GradCAM
+# 🧠 Brain Tumor Classification & Diagnostic Studio
 
-A deep learning project for classifying brain tumors from MRI images using EfficientNetB1 and visualizing model predictions with Gradient-weighted Class Activation Mapping (GradCAM).
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.10%2B-FF6F00.svg)
+![Accuracy](https://img.shields.io/badge/Test_Accuracy-99.08%25-brightgreen.svg)
+![UI Theme](https://img.shields.io/badge/UI_Theme-Clean_Light_Medical-2563eb.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-## 📋 Overview
+An advanced deep learning framework and **interactive Web Diagnostic Studio** for classifying brain tumors from MRI scans using **EfficientNetB1** and visualizing model decision rationale with **Gradient-weighted Class Activation Mapping (Grad-CAM)**.
 
-This project implements a brain tumor classification system that can identify four types of brain conditions from MRI scans:
-- **Glioma** - A type of tumor that occurs in the brain and spinal cord
-- **Meningioma** - A tumor that arises from the meninges
-- **Pituitary** - Tumors that form in the pituitary gland
-- **No Tumor** - Healthy brain scans with no tumor present
+---
 
-## 🎯 Features
+## 🌟 Key Features
 
-- **Image Preprocessing**: Automatic brain region cropping using contour detection
-- **Data Augmentation**: Rotation, horizontal flip, and height shift for improved generalization
-- **Transfer Learning**: Utilizes EfficientNetB1 pretrained on ImageNet
-- **Model Interpretability**: GradCAM visualization to understand model decisions
-- **Comprehensive Evaluation**: Confusion matrix, classification report, and accuracy metrics
+- 🏥 **Minimal & Clean Light Medical UI**: Built with a clean slate aesthetic, subtle shadows, high readability, and responsive design for clinical clarity.
+- 🔬 **Interactive Diagnostic Studio**: Drag-and-drop custom MRI scans or select curated sample scans (Glioma, Meningioma, Pituitary, No Tumor).
+- 🎨 **Grad-CAM Heatmap Explorer**:
+  - Live opacity slider control
+  - Multiple colormap themes (*Jet, Turbo, Plasma, Viridis, Inferno*)
+  - Click-to-inspect pixel activation intensity scores
+- ✂️ **OpenCV Contour Crop Preprocessor Visualizer**: Step-by-step visual inspection of raw scans, grayscale blur, binary thresholding, bounding box extraction, and 240x240 normalization.
+- 🧩 **3D Brain Anatomical Region Map**: Axial plane slice locator showing tumor origin regions across brain anatomical structures.
+- 📄 **Clinical PDF Report Generator**: One-click printable medical summary containing patient ID, scan metadata, class confidence breakdown, and radiologist disclaimer.
+- 🐍 **Python Flask API Server (`app.py`)**: Production-ready backend for serving live TensorFlow `model.keras` inference and Grad-CAM generation over REST endpoints.
 
-## 📊 Dataset
+---
 
-The project uses the [Brain Tumor MRI Dataset](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset) from Kaggle, which contains MRI images organized into training and testing sets.
+## 🎯 Classification Categories
 
-### Dataset Structure
-```
-Training/
-├── glioma/
-├── meningioma/
-├── notumor/
-└── pituitary/
+The system accurately classifies MRI scans into four distinct clinical categories:
 
-Testing/
-├── glioma/
-├── meningioma/
-├── notumor/
-└── pituitary/
-```
+| Category | Description | Model Test Metrics |
+| :--- | :--- | :--- |
+| **Glioma** | Tumors originating in glial cells of the brain/spinal cord | 99% Precision / 98% Recall |
+| **Meningioma** | Tumors arising from the meningeal membranes surrounding brain | 97% Precision / 98% Recall |
+| **Pituitary** | Tumors forming within the pituitary gland at the skull base | 99% Precision / 99% Recall |
+| **No Tumor** | Healthy MRI scans with clear brain parenchyma | 100% Precision / 100% Recall |
 
-## 🛠️ Technologies Used
+---
 
-- **Python 3.x**
-- **TensorFlow/Keras** - Deep learning framework
-- **OpenCV** - Image processing
-- **NumPy** - Numerical computations
-- **Pandas** - Data manipulation
-- **Matplotlib & Seaborn** - Data visualization
-- **scikit-learn** - Evaluation metrics
-- **imutils** - Image utilities
+## 🚀 Quickstart & Web Application Setup
 
-## 🚀 Installation
+### Option 1: Direct Browser Launch (Standalone Frontend)
+No complex backend installation required! Open `index.html` directly in any web browser or serve with a lightweight HTTP server:
 
-1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/brain-tumor-classification.git
-cd brain-tumor-classification
+# Using Python built-in HTTP server
+python -m http.server 8000
 ```
+Then open `http://localhost:8000` in your browser.
 
-2. Install required packages:
+---
+
+### Option 2: Full Python Backend API Server (`app.py`)
+
+1. **Install Dependencies**:
 ```bash
-pip install tensorflow opencv-python numpy pandas matplotlib seaborn scikit-learn imutils kagglehub tqdm pillow
+pip install -r requirements.txt
 ```
 
-3. Download the dataset:
-```python
-import kagglehub
-path = kagglehub.dataset_download("masoudnickparvar/brain-tumor-mri-dataset")
+2. **Run Python Flask Server**:
+```bash
+python app.py
+```
+The application will launch on `http://localhost:5000` with live REST API capabilities!
+
+---
+
+## 🔌 API Documentation
+
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/` | `GET` | Serves the interactive Diagnostic Studio Web UI |
+| `/api/predict` | `POST` | Upload MRI image file to get class predictions & probabilities |
+| `/api/health` | `GET` | Health check endpoint returning backend status & model load state |
+
+### Sample API Response (`POST /api/predict`)
+
+```json
+{
+  "success": true,
+  "predicted_class": "glioma",
+  "confidence": 0.994,
+  "probabilities": {
+    "glioma": 0.994,
+    "meningioma": 0.004,
+    "notumor": 0.001,
+    "pituitary": 0.001
+  }
+}
 ```
 
-## 📁 Project Structure
+---
+
+## 📊 Dataset & Model Architecture
+
+- **Dataset Source**: [Brain Tumor MRI Dataset](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset) on Kaggle.
+- **Model Backbone**: EfficientNetB1 (pretrained on ImageNet, fine-tuned).
+- **Pooling & Regularization**: Global Max Pooling 2D + Dropout (0.5).
+- **Test Performance**: **99.08% overall accuracy** on 1,311 test scans.
 
 ```
-Brain Tumor Classification/
-├── Brain_Tumor_Classification_Using_DL_&_GradCAM.ipynb  # Main notebook
-├── README.md                                             # Project documentation
-└── model.keras                                           # Saved model weights (after training)
+EfficientNetB1 (Pretrained Backbone)
+         ↓
+  GlobalMaxPooling2D
+         ↓
+    Dropout (0.5)
+         ↓
+Dense (4 Units, Softmax)
 ```
 
-## 🔄 Workflow
-
-1. **Data Loading**: Download and organize the MRI dataset
-2. **Preprocessing**: 
-   - Crop brain regions using contour detection
-   - Resize images to 240x240 pixels
-3. **Data Augmentation**: Apply transformations to increase dataset diversity
-4. **Model Architecture**:
-   - EfficientNetB1 backbone (pretrained on ImageNet)
-   - Global Max Pooling layer
-   - Dropout layer (0.5)
-   - Dense layer with softmax activation (4 classes)
-5. **Training**: 
-   - Optimizer: Adam (learning rate = 0.0001)
-   - Loss: Categorical Crossentropy
-   - Callbacks: ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
-6. **Evaluation**: Generate confusion matrix and classification report
-7. **Visualization**: Use GradCAM to visualize model attention
-
-## 🧠 Model Architecture
-
-```
-EfficientNetB1 (pretrained, frozen weights)
-    ↓
-GlobalMaxPooling2D
-    ↓
-Dropout (0.5)
-    ↓
-Dense (4 units, softmax)
-```
-
-## 📈 Training Configuration
-
-| Parameter | Value |
-|-----------|-------|
-| Input Size | 240 × 240 × 3 |
-| Batch Size | 32 |
-| Learning Rate | 0.0001 |
-| Epochs | 30 (with early stopping) |
-| Validation Split | 20% |
-| Optimizer | Adam |
-
-## 🎨 GradCAM Visualization
-
-GradCAM (Gradient-weighted Class Activation Mapping) is implemented to provide visual explanations of the model's predictions. It highlights the regions of the MRI scan that the model focuses on when making classification decisions, improving model interpretability and trustworthiness in medical applications.
-
-![GradCAM Visualization](gradcam_example.png)
-
-The heatmap overlay shows the areas of the brain MRI that the model considers most important for its prediction, with red/yellow regions indicating high importance.
-
-## 📊 Results
-
-The model achieves an impressive **99.08% accuracy** on the test dataset.
-
-### Training & Validation Curves
-
-![Training and Validation Curves](training_curves.png)
-
-The plots show the model's training and validation accuracy/loss over ~22 epochs. The model converges quickly and maintains stable performance without significant overfitting.
-
-### Classification Report
-
-| Class | Precision | Recall | F1-Score | Support |
-|-------|-----------|--------|----------|---------|
-| Glioma | 0.99 | 0.98 | 0.98 | 300 |
-| Meningioma | 0.97 | 0.98 | 0.98 | 306 |
-| No Tumor | 1.00 | 1.00 | 1.00 | 405 |
-| Pituitary | 0.99 | 0.99 | 0.99 | 300 |
-| **Overall** | **0.99** | **0.99** | **0.99** | **1311** |
-
-### Evaluation Metrics
-
-The model is evaluated using:
-- **Accuracy Score**: 99.08%
-- **Confusion Matrix**
-- **Classification Report** (Precision, Recall, F1-Score)
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+---
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
-
-- [Masoud Nickparvar](https://www.kaggle.com/masoudnickparvar) for providing the Brain Tumor MRI Dataset
-- TensorFlow/Keras team for the EfficientNet implementation
-- The medical imaging community for advancing AI in healthcare
+---
 
 ## ⚠️ Disclaimer
 
-This project is for educational and research purposes only. It should not be used as a substitute for professional medical diagnosis. Always consult healthcare professionals for medical advice.
+This project is created for research and educational purposes. It should not replace professional radiological evaluation or clinical medical diagnosis.

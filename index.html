@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brain Tumor AI Diagnostic Studio | Deep Learning & Grad-CAM</title>
+  <meta name="description" content="Medical AI Brain Tumor Classification & Grad-CAM Heatmap Explorer using EfficientNetB1.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand-header">
+        <div class="brand-icon">🧠</div>
+        <div>
+          <h1 class="brand-title">NeuroVision AI</h1>
+          <p class="brand-subtitle">EfficientNetB1 + GradCAM</p>
+        </div>
+      </div>
+
+      <ul class="nav-list">
+        <li class="nav-item active" data-tab="studio">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+          Diagnostic Studio
+        </li>
+        <li class="nav-item" data-tab="preprocessing">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          Preprocessing Engine
+        </li>
+        <li class="nav-item" data-tab="anatomy">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2 1m0 0L10 4m2 1v2.5M4 7l2 1M4 7l2-1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1m2 1l2-1m-2 1v-2.5m12 2.5l2-1m-2 1l-2-1m2 1v-2.5"></path></svg>
+          3D Anatomy Map
+        </li>
+        <li class="nav-item" data-tab="report">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          Clinical Report
+        </li>
+        <li class="nav-item" data-tab="analytics">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          Model Performance
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="status-badge">
+          <span class="status-dot" id="api-status-dot"></span>
+          <span id="api-status-text">Client Standalone Mode</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Top Header -->
+      <header class="top-header">
+        <div>
+          <h2 class="page-title" id="page-title">Diagnostic Studio</h2>
+          <p class="page-description" id="page-description">Upload brain MRI scan or select sample scan for classification & Grad-CAM explainability.</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-outline" id="btn-reset">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            Reset
+          </button>
+          <button class="btn btn-primary" id="btn-export-report">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            Print Report
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB 1: DIAGNOSTIC STUDIO -->
+      <section class="tab-panel active" id="panel-studio">
+        <div class="grid grid-2-1">
+          
+          <!-- Left Column: Input & GradCAM Visualizer -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">MRI Scan & Grad-CAM Visualizer</h3>
+                <p class="card-subtitle">Real-time activation heatmap overlay showing model focus areas</p>
+              </div>
+            </div>
+
+            <!-- Drag & Drop Zone -->
+            <div class="dropzone" id="dropzone">
+              <input type="file" id="file-input" accept="image/*" hidden>
+              <div class="dropzone-icon">📁</div>
+              <p class="dropzone-text">Click or drag & drop brain MRI scan here</p>
+              <p class="dropzone-hint">Supports DICOM convert, PNG, JPG, JPEG (Max 15MB)</p>
+            </div>
+
+            <!-- Sample Scans -->
+            <div style="margin-top: 1.25rem;">
+              <p style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem;">Or load curated sample MRI scan:</p>
+              <div class="samples-grid">
+                <div class="sample-card selected" data-sample="glioma">
+                  <canvas class="sample-img-thumb" id="thumb-glioma"></canvas>
+                  <div class="sample-label">Glioma</div>
+                </div>
+                <div class="sample-card" data-sample="meningioma">
+                  <canvas class="sample-img-thumb" id="thumb-meningioma"></canvas>
+                  <div class="sample-label">Meningioma</div>
+                </div>
+                <div class="sample-card" data-sample="pituitary">
+                  <canvas class="sample-img-thumb" id="thumb-pituitary"></canvas>
+                  <div class="sample-label">Pituitary</div>
+                </div>
+                <div class="sample-card" data-sample="notumor">
+                  <canvas class="sample-img-thumb" id="thumb-notumor"></canvas>
+                  <div class="sample-label">No Tumor</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Scan Canvas Viewer -->
+            <div style="margin-top: 1.5rem;">
+              <div class="viewer-container">
+                <canvas id="mri-canvas" class="viewer-canvas"></canvas>
+              </div>
+
+              <!-- Grad-CAM Controls -->
+              <div class="slider-group">
+                <div class="slider-label">
+                  <span>Grad-CAM Overlay Opacity</span>
+                  <span id="opacity-val">65%</span>
+                </div>
+                <input type="range" id="slider-opacity" min="0" max="100" value="65">
+              </div>
+
+              <div style="margin-top: 1rem;">
+                <div class="slider-label"><span>Colormap Theme</span></div>
+                <div class="colormap-selector">
+                  <button class="colormap-btn active" data-map="jet">Jet</button>
+                  <button class="colormap-btn" data-map="turbo">Turbo</button>
+                  <button class="colormap-btn" data-map="plasma">Plasma</button>
+                  <button class="colormap-btn" data-map="viridis">Viridis</button>
+                  <button class="colormap-btn" data-map="inferno">Inferno</button>
+                </div>
+              </div>
+
+              <div class="pixel-info" id="pixel-inspector">
+                <span>Click scan to inspect feature activation</span>
+                <span id="pixel-score">Intensity: --</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Column: AI Predictions & Classification -->
+          <div class="grid" style="align-content: start;">
+            
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Diagnostic Findings</h3>
+                <span class="card-subtitle">EfficientNetB1</span>
+              </div>
+
+              <div style="text-align: center; padding: 0.5rem 0;">
+                <div class="prediction-badge badge-glioma" id="top-prediction-badge">
+                  <span id="pred-icon">🚨</span>
+                  <span id="pred-class-text">Glioma Tumor Detected</span>
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                  Model Confidence: <strong id="top-confidence-val" style="color: var(--text-primary);">99.4%</strong>
+                </div>
+              </div>
+
+              <h4 style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.75rem;">Class Probabilities Breakdown</h4>
+
+              <div class="prob-item">
+                <div class="prob-header">
+                  <span>Glioma</span>
+                  <span id="prob-val-glioma">99.4%</span>
+                </div>
+                <div class="prob-track">
+                  <div class="prob-fill fill-danger" id="prob-bar-glioma" style="width: 99.4%;"></div>
+                </div>
+              </div>
+
+              <div class="prob-item">
+                <div class="prob-header">
+                  <span>Meningioma</span>
+                  <span id="prob-val-meningioma">0.4%</span>
+                </div>
+                <div class="prob-track">
+                  <div class="prob-fill fill-warning" id="prob-bar-meningioma" style="width: 0.4%;"></div>
+                </div>
+              </div>
+
+              <div class="prob-item">
+                <div class="prob-header">
+                  <span>Pituitary</span>
+                  <span id="prob-val-pituitary">0.1%</span>
+                </div>
+                <div class="prob-track">
+                  <div class="prob-fill fill-primary" id="prob-bar-pituitary" style="width: 0.1%;"></div>
+                </div>
+              </div>
+
+              <div class="prob-item">
+                <div class="prob-header">
+                  <span>No Tumor</span>
+                  <span id="prob-val-notumor">0.1%</span>
+                </div>
+                <div class="prob-track">
+                  <div class="prob-fill fill-success" id="prob-bar-notumor" style="width: 0.1%;"></div>
+                </div>
+              </div>
+
+              <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-secondary);">
+                <strong>Clinical Notes:</strong>
+                <p id="clinical-notes-text" style="margin-top: 0.25rem;">Grad-CAM heat map reveals significant gradient attention focused in the cerebral hemisphere ROI.</p>
+              </div>
+            </div>
+
+            <!-- Quick Specs Card -->
+            <div class="card">
+              <h3 class="card-title" style="margin-bottom: 1rem;">Technical Specifications</h3>
+              <ul style="list-style: none; font-size: 0.85rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.6rem;">
+                <li style="display: flex; justify-content: space-between;">
+                  <span>Architecture</span>
+                  <strong style="color: var(--text-primary);">EfficientNetB1</strong>
+                </li>
+                <li style="display: flex; justify-content: space-between;">
+                  <span>Input Resolution</span>
+                  <strong style="color: var(--text-primary);">240 × 240 × 3</strong>
+                </li>
+                <li style="display: flex; justify-content: space-between;">
+                  <span>Test Accuracy</span>
+                  <strong style="color: var(--success);">99.08%</strong>
+                </li>
+                <li style="display: flex; justify-content: space-between;">
+                  <span>Crop Pipeline</span>
+                  <strong style="color: var(--text-primary);">Contour Detection</strong>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB 2: PREPROCESSING ENGINE -->
+      <section class="tab-panel" id="panel-preprocessing">
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Automated Brain Region Contour Crop Pipeline</h3>
+              <p class="card-subtitle">Reduces background noise by isolating brain anatomy with OpenCV contour detection</p>
+            </div>
+          </div>
+
+          <div class="pipeline-steps">
+            <div class="pipeline-card">
+              <div class="pipeline-step-num">Step 1</div>
+              <div class="pipeline-step-title">Raw Input Scan</div>
+              <canvas class="pipeline-canvas" id="pipe-step1"></canvas>
+            </div>
+            <div class="pipeline-card">
+              <div class="pipeline-step-num">Step 2</div>
+              <div class="pipeline-step-title">Grayscale & Blur</div>
+              <canvas class="pipeline-canvas" id="pipe-step2"></canvas>
+            </div>
+            <div class="pipeline-card">
+              <div class="pipeline-step-num">Step 3</div>
+              <div class="pipeline-step-title">Binary Thresholding</div>
+              <canvas class="pipeline-canvas" id="pipe-step3"></canvas>
+            </div>
+            <div class="pipeline-card">
+              <div class="pipeline-step-num">Step 4</div>
+              <div class="pipeline-step-title">Contour Bounding Box</div>
+              <canvas class="pipeline-canvas" id="pipe-step4"></canvas>
+            </div>
+            <div class="pipeline-card">
+              <div class="pipeline-step-num">Step 5</div>
+              <div class="pipeline-step-title">Cropped (240×240)</div>
+              <canvas class="pipeline-canvas" id="pipe-step5"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: 3D ANATOMY MAP -->
+      <section class="tab-panel" id="panel-anatomy">
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">3D Brain Slice & Tumor Origin Map</h3>
+              <span class="card-subtitle">Anatomical Localization</span>
+            </div>
+            <div class="viewer-container" style="max-width: 450px;">
+              <canvas id="canvas-3d" class="viewer-canvas"></canvas>
+            </div>
+            <p style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem;">Drag slider below to slice through axial brain planes</p>
+            <div class="slider-group">
+              <div class="slider-label"><span>Axial Slice Plane (Z-Axis)</span><span id="slice-val">Slice 16 / 32</span></div>
+              <input type="range" id="slider-3d-slice" min="1" max="32" value="16">
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title" style="margin-bottom: 1rem;">Anatomical Tumor Characteristics</h3>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Tumor Class</th>
+                  <th>Origin Location</th>
+                  <th>Scan Characteristics</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong style="color: var(--danger);">Glioma</strong></td>
+                  <td>Cerebral Hemispheres / Subcortical</td>
+                  <td>Infiltrative mass with surrounding edema</td>
+                </tr>
+                <tr>
+                  <td><strong style="color: var(--warning);">Meningioma</strong></td>
+                  <td>Dural Meninges / Brain Surface</td>
+                  <td>Extra-axial dural attachment with uniform contrast enhancement</td>
+                </tr>
+                <tr>
+                  <td><strong style="color: var(--primary);">Pituitary</strong></td>
+                  <td>Sella Turcica / Skull Base</td>
+                  <td>Sellar & suprasellar lesion compressing optic chiasm</td>
+                </tr>
+                <tr>
+                  <td><strong style="color: var(--success);">No Tumor</strong></td>
+                  <td>Normal Parenchyma</td>
+                  <td>Symmetrical brain ventricles, clear sulci and gyri</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: CLINICAL REPORT -->
+      <section class="tab-panel" id="panel-report">
+        <div class="report-sheet">
+          <div class="report-header">
+            <div>
+              <h1 class="report-title">NEUROVISION AI CLINICAL REPORT</h1>
+              <p style="font-size: 0.85rem; color: var(--text-secondary);">Automated MRI Analysis & Grad-CAM Visual Findings</p>
+            </div>
+            <div class="report-meta">
+              <div><strong>Report ID:</strong> NVR-2026-8841</div>
+              <div><strong>Date:</strong> <span id="report-date"></span></div>
+            </div>
+          </div>
+
+          <div class="report-section">
+            <h4 class="report-section-title">Patient & Scan Metadata</h4>
+            <div class="report-grid">
+              <div class="report-field"><span class="report-label">Patient ID</span><span class="report-val">P-9482-MRI</span></div>
+              <div class="report-field"><span class="report-label">Scan Sequence</span><span class="report-val">T1-Weighted Contrast Enhanced</span></div>
+              <div class="report-field"><span class="report-label">Model System</span><span class="report-val">EfficientNetB1 (99.08% Accuracy)</span></div>
+              <div class="report-field"><span class="report-label">Preprocessing</span><span class="report-val">Contour Crop (240x240)</span></div>
+            </div>
+          </div>
+
+          <div class="report-section">
+            <h4 class="report-section-title">Classification Impression</h4>
+            <div style="background-color: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-md); border-left: 4px solid var(--primary);">
+              <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);" id="report-finding-title">Primary Diagnosis: Glioma Tumor</div>
+              <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem;" id="report-finding-desc">Model confidence score is 99.4%. High gradient attention overlay confirmed at primary lesion site.</div>
+            </div>
+          </div>
+
+          <div class="report-section">
+            <h4 class="report-section-title">Class Confidence Summary</h4>
+            <div id="report-prob-list"></div>
+          </div>
+
+          <div class="report-section" style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <p style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Disclaimer: This AI analysis report is intended for research and decision-support purposes only. Final clinical diagnosis must be performed by a qualified radiologist or medical practitioner.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: ANALYTICS & METRICS -->
+      <section class="tab-panel" id="panel-analytics">
+        <div class="grid grid-2">
+          
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Confusion Matrix (1,311 Test Scans)</h3>
+              <span class="card-subtitle">Test Accuracy: 99.08%</span>
+            </div>
+            <table class="table" style="text-align: center;">
+              <thead>
+                <tr>
+                  <th>Actual \ Pred</th>
+                  <th>Glioma</th>
+                  <th>Meningioma</th>
+                  <th>No Tumor</th>
+                  <th>Pituitary</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Glioma</strong></td>
+                  <td style="background:#dcfce7; font-weight:700; color:#15803d;">294</td>
+                  <td>4</td>
+                  <td>0</td>
+                  <td>2</td>
+                </tr>
+                <tr>
+                  <td><strong>Meningioma</strong></td>
+                  <td>2</td>
+                  <td style="background:#dcfce7; font-weight:700; color:#15803d;">300</td>
+                  <td>0</td>
+                  <td>4</td>
+                </tr>
+                <tr>
+                  <td><strong>No Tumor</strong></td>
+                  <td>0</td>
+                  <td>0</td>
+                  <td style="background:#dcfce7; font-weight:700; color:#15803d;">405</td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <td><strong>Pituitary</strong></td>
+                  <td>1</td>
+                  <td>2</td>
+                  <td>0</td>
+                  <td style="background:#dcfce7; font-weight:700; color:#15803d;">297</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Classification Metrics</h3>
+              <span class="card-subtitle">Kaggle Dataset Benchmark</span>
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Class</th>
+                  <th>Precision</th>
+                  <th>Recall</th>
+                  <th>F1-Score</th>
+                  <th>Support</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Glioma</td>
+                  <td>0.99</td>
+                  <td>0.98</td>
+                  <td>0.98</td>
+                  <td>300</td>
+                </tr>
+                <tr>
+                  <td>Meningioma</td>
+                  <td>0.97</td>
+                  <td>0.98</td>
+                  <td>0.98</td>
+                  <td>306</td>
+                </tr>
+                <tr>
+                  <td>No Tumor</td>
+                  <td>1.00</td>
+                  <td>1.00</td>
+                  <td>1.00</td>
+                  <td>405</td>
+                </tr>
+                <tr>
+                  <td>Pituitary</td>
+                  <td>0.99</td>
+                  <td>0.99</td>
+                  <td>0.99</td>
+                  <td>300</td>
+                </tr>
+                <tr style="font-weight: 700; background-color: var(--bg-subtle);">
+                  <td>Overall</td>
+                  <td>0.99</td>
+                  <td>0.99</td>
+                  <td>0.99</td>
+                  <td>1311</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
